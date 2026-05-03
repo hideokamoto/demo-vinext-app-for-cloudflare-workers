@@ -1,31 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# next-to-vinext
 
-## Getting Started
+Next.js 16（App Router）を [vinext](https://www.npmjs.com/package/vinext) で **Cloudflare Workers** 上に載せるサンプルです。Vite と Wrangler を組み合わせ、`wrangler.jsonc` で静的アセットと画像最適化用バインディングを用意したうえで `vinext deploy` まで一通り動かせます。
 
-[pnpm](https://pnpm.io/installation) を入れたうえで、依存関係を入れてから開発サーバーを起動します。
+## 前提
+
+- [pnpm](https://pnpm.io/installation)（このリポジトリは `pnpm@9.15.0` を想定）
+- Cloudflare へのデプロイには Wrangler のログインなどが必要です
+
+## セットアップ
 
 ```bash
 pnpm install
-pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 開発
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| コマンド | 説明 |
+| --- | --- |
+| `pnpm dev` | 通常の Next.js 開発サーバー（既定ポート 3000） |
+| `pnpm dev:vinext` | vinext 経由の開発（既定 `--port 3001`） |
+| `pnpm preview:worker` | `wrangler dev` で Worker プレビュー |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+ブラウザで [http://localhost:3001](http://localhost:3001)（vinext 開発時）または [http://localhost:3000](http://localhost:3000)（`pnpm dev` 時）を開きます。
 
-## Learn More
+ページの編集は `app/page.tsx` など App Router 配下から行えます。エントリは `worker/index.ts` で vinext の App Router / RSC ハンドラに接続されています。
 
-To learn more about Next.js, take a look at the following resources:
+## ビルド・本番起動・デプロイ
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+pnpm build:vinext    # vinext ビルド（クライアント出力は wrangler の assets と整合）
+pnpm start:vinext    # ビルド成果物を vinext で起動
+pnpm deploy          # vinext deploy（Cloudflare へ）
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Wrangler 設定
 
-## Deploy on Vercel
+`wrangler.jsonc` で Worker の `main`（`./worker/index.ts`）、静的アセット `ASSETS`（`dist/client`）、画像 `IMAGES` バインディングを定義しています。名前や日付を変える場合はこのファイルを編集してください。
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## その他のスクリプト
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `pnpm typecheck` — `next typegen` と `tsc --noEmit`
+- `pnpm test` — Vitest
+- `pnpm lint` — ESLint
+- `pnpm cf:types` — `wrangler types`
+
+## 補足
+
+このリポジトリで使っている Next.js は、一般に知られている版と API・慣例・ディレクトリ構成が異なる場合があります。コードを書く前に `AGENTS.md` と `node_modules/next/dist/docs/` の該当ガイドを参照してください。
