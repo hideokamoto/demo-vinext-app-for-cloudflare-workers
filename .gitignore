@@ -12,6 +12,7 @@
 
 # testing
 /coverage
+/reports
 
 # next.js
 /.next/
@@ -38,7 +39,6 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
-next-env.d.ts
 /dist/
 /.vinext
 .wrangler
